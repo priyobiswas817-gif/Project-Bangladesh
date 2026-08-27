@@ -5,17 +5,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build APK
+
+      - name: Extract and Find Project
         run: |
           unzip -o PRIYO_CODEX.zip || true
-          if [ -d "PRIYO_CODEX" ]; then cd PRIYO_CODEX; fi
+          # gradlew ফাইল কোথায় আছে তা খুঁজে মূল জায়গায় কপি করে আনা
+          GRADLE_DIR=$(find . -name "gradlew" -exec dirname {} \;)
+          echo "PROJECT_DIR=$GRADLE_DIR" >> $GITHUB_ENV
+
+      - name: Build APK
+        run: |
+          cd ${{ env.PROJECT_DIR }}
           chmod +x gradlew
           ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
