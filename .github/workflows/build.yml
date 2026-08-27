@@ -12,16 +12,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Extract and Find Project
+      - name: Build APK Direct
         run: |
           unzip -o PRIYO_CODEX.zip || true
-          # gradlew ফাইল কোথায় আছে তা খুঁজে মূল জায়গায় কপি করে আনা
-          GRADLE_DIR=$(find . -name "gradlew" -exec dirname {} \;)
-          echo "PROJECT_DIR=$GRADLE_DIR" >> $GITHUB_ENV
-
-      - name: Build APK
-        run: |
-          cd ${{ env.PROJECT_DIR }}
+          TARGET_DIR=$(dirname $(find . -name "gradlew" | head -n 1))
+          cd "$TARGET_DIR"
           chmod +x gradlew
           ./gradlew assembleDebug
 
